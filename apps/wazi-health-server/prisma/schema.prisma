@@ -1,0 +1,88 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Hospital {
+  address       String?
+  contactNumber String?
+  createdAt     DateTime  @default(now())
+  doctors       Doctor[]
+  id            String    @id @default(cuid())
+  name          String?
+  patients      Patient[]
+  updatedAt     DateTime  @updatedAt
+}
+
+model Patient {
+  appointments Appointment[]
+  createdAt    DateTime      @default(now())
+  dateOfBirth  DateTime?
+  documents    Document[]
+  firstName    String?
+  hospital     Hospital?     @relation(fields: [hospitalId], references: [id])
+  hospitalId   String?
+  id           String        @id @default(cuid())
+  lastName     String?
+  scans        Scan[]
+  updatedAt    DateTime      @updatedAt
+}
+
+model Document {
+  createdAt DateTime @default(now())
+  file      Json?
+  id        String   @id @default(cuid())
+  name      String?
+  patient   Patient? @relation(fields: [patientId], references: [id])
+  patientId String?
+  updatedAt DateTime @updatedAt
+}
+
+model Doctor {
+  appointments Appointment[]
+  createdAt    DateTime      @default(now())
+  firstName    String?
+  hospital     Hospital?     @relation(fields: [hospitalId], references: [id])
+  hospitalId   String?
+  id           String        @id @default(cuid())
+  lastName     String?
+  specialty    String?
+  updatedAt    DateTime      @updatedAt
+}
+
+model Appointment {
+  createdAt DateTime  @default(now())
+  date      DateTime?
+  doctor    Doctor?   @relation(fields: [doctorId], references: [id])
+  doctorId  String?
+  id        String    @id @default(cuid())
+  patient   Patient?  @relation(fields: [patientId], references: [id])
+  patientId String?
+  updatedAt DateTime  @updatedAt
+}
+
+model Scan {
+  createdAt DateTime @default(now())
+  id        String   @id @default(cuid())
+  image     Json?
+  name      String?
+  patient   Patient? @relation(fields: [patientId], references: [id])
+  patientId String?
+  updatedAt DateTime @updatedAt
+}
+
+model User {
+  createdAt DateTime @default(now())
+  email     String?  @unique
+  firstName String?
+  id        String   @id @default(cuid())
+  lastName  String?
+  password  String
+  roles     Json
+  updatedAt DateTime @updatedAt
+  username  String   @unique
+}
